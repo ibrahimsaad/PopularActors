@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">PopularActors</string>
+    <string name="action_saved_images">Saved images</string>
+    <string name="search">Search</string>
 </resources>

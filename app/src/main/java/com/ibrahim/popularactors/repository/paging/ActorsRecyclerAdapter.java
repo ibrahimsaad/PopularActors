@@ -25,7 +25,7 @@ public class ActorsRecyclerAdapter extends
     private ItemClickListener itemClickListener;
 
 
-    private interface ItemClickListener {
+    public interface ItemClickListener {
         void OnItemClick(Actor actor);
     }
 

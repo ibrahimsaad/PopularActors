@@ -1,31 +1,44 @@
 package com.ibrahim.popularactors.ui.actors;
 
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.arch.paging.PagedList;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ibrahim.popularactors.R;
+import com.ibrahim.popularactors.repository.model.Actor;
+import com.ibrahim.popularactors.repository.paging.ActorsRecyclerAdapter;
+import com.ibrahim.popularactors.viewModel.ActorListViewModel;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 
-public class PopularActorsFragment extends Fragment {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private String mParam1;
-    private String mParam2;
+public class PopularActorsFragment extends Fragment
+        implements ActorsRecyclerAdapter.ItemClickListener {
+
+    @BindView(R.id.popularActorsRecyclerView)
+    RecyclerView popularActorsRecyclerView;
+    Unbinder unbinder;
+    private ActorsRecyclerAdapter actorsRecyclerAdapter;
+    private ActorListViewModel actorListViewModel;
 
 
     public PopularActorsFragment() {
     }
 
-    public static PopularActorsFragment newInstance(String param1, String param2) {
+    public static PopularActorsFragment newInstance() {
         PopularActorsFragment fragment = new PopularActorsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -33,16 +46,46 @@ public class PopularActorsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+//            mParam1 = getArguments().getString(ARG_PARAM1);
+//            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_popular_actors, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_popular_actors,
+                container, false);
+        unbinder = ButterKnife.bind(this, view);
+
+        //<editor-fold desc="Init recyclerView">
+        popularActorsRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        popularActorsRecyclerView.setHasFixedSize(true);
+        actorListViewModel = ViewModelProviders.of(this)
+                .get(ActorListViewModel.class);
+
+        actorsRecyclerAdapter = new ActorsRecyclerAdapter(getActivity(), this);
+        actorListViewModel.itemPagedList.observe(this, new Observer<PagedList<Actor>>() {
+            @Override
+            public void onChanged(@Nullable PagedList<Actor> items) {
+                actorsRecyclerAdapter.submitList(items);
+            }
+        });
+        popularActorsRecyclerView.setAdapter(actorsRecyclerAdapter);
+        //</editor-fold>
+
+        return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    @Override
+    public void OnItemClick(Actor actor) {
+
+    }
 }

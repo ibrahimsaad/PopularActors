@@ -9,31 +9,20 @@ import android.view.ViewGroup;
 import com.ibrahim.popularactors.R;
 
 public class ActorDetailsFragment extends Fragment {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private String mParam1;
-    private String mParam2;
 
     public ActorDetailsFragment() {
         // Required empty public constructor
     }
 
-    public static ActorDetailsFragment newInstance(String param1, String param2) {
+    public static ActorDetailsFragment newInstance() {
         ActorDetailsFragment fragment = new ActorDetailsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override

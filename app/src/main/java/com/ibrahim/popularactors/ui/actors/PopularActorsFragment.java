@@ -45,10 +45,6 @@ public class PopularActorsFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -62,10 +58,11 @@ public class PopularActorsFragment extends Fragment
         //<editor-fold desc="Init recyclerView">
         popularActorsRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         popularActorsRecyclerView.setHasFixedSize(true);
+        actorsRecyclerAdapter = new ActorsRecyclerAdapter(getActivity(), this);
+
         actorListViewModel = ViewModelProviders.of(this)
                 .get(ActorListViewModel.class);
 
-        actorsRecyclerAdapter = new ActorsRecyclerAdapter(getActivity(), this);
         actorListViewModel.itemPagedList.observe(this, new Observer<PagedList<Actor>>() {
             @Override
             public void onChanged(@Nullable PagedList<Actor> items) {

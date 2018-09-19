@@ -1,6 +1,7 @@
 package com.ibrahim.popularactors.repository.network;
 
-import com.google.gson.JsonObject;
+import com.ibrahim.popularactors.repository.model.ActorDetails;
+import com.ibrahim.popularactors.repository.model.ActorImageResponse;
 import com.ibrahim.popularactors.repository.model.PopularActors;
 
 import retrofit2.Call;
@@ -14,5 +15,9 @@ public interface Api {
     Call<PopularActors> fetchPopularActors(@Query("page") int page);
 
     @GET("person/{person_id}")
-    Call<JsonObject> getActorDetails(@Path("userid") int userId);
+    Call<ActorDetails> getActorDetails(@Path("person_id") int personId);
+
+
+    @GET("person/{person_id}/images")
+    Call<ActorImageResponse> getActorImages(@Path("person_id") int personId);
 }

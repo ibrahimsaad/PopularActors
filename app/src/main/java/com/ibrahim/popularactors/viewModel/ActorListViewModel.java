@@ -1,32 +1,30 @@
 package com.ibrahim.popularactors.viewModel;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
-import android.arch.paging.LivePagedListBuilder;
-import android.arch.paging.PageKeyedDataSource;
 import android.arch.paging.PagedList;
+import android.support.annotation.NonNull;
 
+import com.ibrahim.popularactors.repository.NetworkState;
+import com.ibrahim.popularactors.repository.ActorsRepository;
 import com.ibrahim.popularactors.repository.model.Actor;
-import com.ibrahim.popularactors.repository.paging.ActorDataSource;
-import com.ibrahim.popularactors.repository.paging.ActorDataSourceFactory;
 
-public class ActorListViewModel extends ViewModel {
+public class ActorListViewModel extends AndroidViewModel {
 
-    public LiveData<PagedList<Actor>> itemPagedList;
 
-    public ActorListViewModel() {
-        //getting our data source factory
-        ActorDataSourceFactory itemDataSourceFactory = new ActorDataSourceFactory();
-//        LiveData<PageKeyedDataSource<Integer, Actor>> liveDataSource =
-//                itemDataSourceFactory.getItemLiveDataSource();
-        PagedList.Config pagedListConfig =
-                (new PagedList.Config.Builder())
-                        .setEnablePlaceholders(false)
-                        .setPageSize(ActorDataSource.PAGE_SIZE).build();
-        itemPagedList = (new LivePagedListBuilder(itemDataSourceFactory, pagedListConfig))
-                .build();
+private ActorsRepository repository;
+
+    public ActorListViewModel(@NonNull Application application) {
+        super(application);
+        repository = ActorsRepository.getInstance(application);
     }
-    public void updateData (){
-
+    public LiveData<PagedList<Actor>> getActors() {
+        return repository.getMovies();
     }
+
+    public LiveData<NetworkState> getNetworkState() {
+        return repository.getNetworkState();
+    }
+
 }

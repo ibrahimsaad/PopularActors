@@ -1,11 +1,10 @@
 package com.ibrahim.popularactors.ui.actors;
 
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.paging.PagedList;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,9 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ibrahim.popularactors.repository.NetworkState;
 import com.ibrahim.popularactors.R;
 import com.ibrahim.popularactors.repository.model.Actor;
-import com.ibrahim.popularactors.repository.paging.ActorsRecyclerAdapter;
+import com.ibrahim.popularactors.ui.adapter.ActorsRecyclerAdapter;
+import com.ibrahim.popularactors.listeners.ItemClickListener;
+import com.ibrahim.popularactors.ui.details.ActorDetailsActivity;
 import com.ibrahim.popularactors.viewModel.ActorListViewModel;
 
 import butterknife.BindView;
@@ -24,11 +26,13 @@ import butterknife.Unbinder;
 
 
 public class PopularActorsFragment extends Fragment
-        implements ActorsRecyclerAdapter.ItemClickListener {
+        implements ItemClickListener {
 
     @BindView(R.id.popularActorsRecyclerView)
     RecyclerView popularActorsRecyclerView;
     Unbinder unbinder;
+    @BindView(R.id.parentProgressView)
+    ConstraintLayout parentProgressView;
     private ActorsRecyclerAdapter actorsRecyclerAdapter;
     private ActorListViewModel actorListViewModel;
 
@@ -38,7 +42,6 @@ public class PopularActorsFragment extends Fragment
 
     public static PopularActorsFragment newInstance() {
         PopularActorsFragment fragment = new PopularActorsFragment();
-
         return fragment;
     }
 
@@ -55,24 +58,34 @@ public class PopularActorsFragment extends Fragment
                 container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        //<editor-fold desc="Init recyclerView">
+        //<editor-fold desc="Init recyclerView and its adapter">
         popularActorsRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         popularActorsRecyclerView.setHasFixedSize(true);
-        actorsRecyclerAdapter = new ActorsRecyclerAdapter(getActivity(), this);
+        actorsRecyclerAdapter = new ActorsRecyclerAdapter(this);
 
+        //</editor-fold>
+
+        initViewModel();
+
+        return view;
+    }
+
+    private void initViewModel() {
         actorListViewModel = ViewModelProviders.of(this)
                 .get(ActorListViewModel.class);
 
-        actorListViewModel.itemPagedList.observe(this, new Observer<PagedList<Actor>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<Actor> items) {
-                actorsRecyclerAdapter.submitList(items);
-            }
-        });
-        popularActorsRecyclerView.setAdapter(actorsRecyclerAdapter);
-        //</editor-fold>
+        actorListViewModel.getActors().observe(this,
+                actorsRecyclerAdapter::submitList);
+        actorListViewModel.getNetworkState().observe(this,
+                networkState -> {
+                    if (networkState.getMsg() == NetworkState.SUCCESS_RUNNING) {
+                        parentProgressView.setVisibility(View.VISIBLE);
+                    } else {
+                        parentProgressView.setVisibility(View.GONE);
 
-        return view;
+                    }
+                });
+        popularActorsRecyclerView.setAdapter(actorsRecyclerAdapter);
     }
 
     @Override
@@ -83,6 +96,9 @@ public class PopularActorsFragment extends Fragment
 
     @Override
     public void OnItemClick(Actor actor) {
+        Intent mIntent = new Intent(getActivity(), ActorDetailsActivity.class);
+        mIntent.putExtra("EXTRA", actor);
+        startActivity(mIntent);
 
     }
 }
